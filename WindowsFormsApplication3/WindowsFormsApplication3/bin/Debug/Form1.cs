@@ -113,7 +113,8 @@ namespace WindowsFormsApplication3
                     }
                 }
                 //スケルトンのフレームを取得する
-                using(SkeletonFrame skeletonFrame = e.OpenSkeletonFrame()){
+                using (SkeletonFrame skeletonFrame = e.OpenSkeletonFrame())
+                {
                     if (skeletonFrame != null)
                     {
                         const int R = 5;
@@ -127,7 +128,7 @@ namespace WindowsFormsApplication3
                         foreach (var skeleton in skeletons)
                         {
                             //スケルトンがトラッキングされてなければ次へ
-                            if ( skeleton.TrackingState != SkeletonTrackingState.Tracked)
+                            if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
                             {
                                 continue;
                             }
@@ -143,7 +144,7 @@ namespace WindowsFormsApplication3
 
                                 //スケルトンの座標を、RGBカメラの座標に変換して円を書く
                                 ColorImagePoint point =
-                              kinect.MapSkeletonPointToColor(joint.Position,kinect.ColorStream.Format);
+                              kinect.MapSkeletonPointToColor(joint.Position, kinect.ColorStream.Format);
                                 g.DrawEllipse(new Pen(Brushes.Red),
                                   new Rectangle(point.X - R, point.Y - R, R * 2, R * 2));
 
@@ -156,7 +157,7 @@ namespace WindowsFormsApplication3
             {
                 MessageBox.Show(ex.Message);
             }
-         }
+        }
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -165,7 +166,7 @@ namespace WindowsFormsApplication3
 
         private void richTextBox1_TextChanged(object sender, EventArgs e)
         {
-          
+
         }
 
         private void button1_Click(object sender, EventArgs e)
@@ -175,7 +176,7 @@ namespace WindowsFormsApplication3
             richTextBox1.Text = "";
 
             string text = richTextBox1.Text;
-          
+
 
             foreach (var skeleton in skeletons)
             {
@@ -185,7 +186,7 @@ namespace WindowsFormsApplication3
                     continue;
                 }
                 i++;
-                richTextBox1.Text += "" + i + "人目の座標"+Environment.NewLine +"";
+                richTextBox1.Text += "" + i + "人目の座標" + Environment.NewLine + "";
 
                 //ジョイントを描画する
                 foreach (Joint joint in skeleton.Joints)
@@ -199,13 +200,77 @@ namespace WindowsFormsApplication3
                     richTextBox1.Text += "-" + joint.Position.X + "" + Environment.NewLine + "";
                 }
 
-                      
-               }
-         }
+
+            }
+        }
+
+        private void pictureBoxRgb_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        private void button3_Click(object sender, EventArgs e)
+        {
+           // while (true)
+            //{
+                richTextBox1.Text = "";
+
+                string text = richTextBox1.Text;
 
 
-      }
- }  
+                foreach (var skeleton in skeletons)
+                {
+                    //スケルトンがトラッキングされてなければ次へ
+                    if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
+                    {
+                        continue;
+                    }
+
+                    if (skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.ShoulderRight].Position.Y && skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ShoulderLeft].Position.Y)
+                    {
+                        richTextBox1.Text += "投球フォームを構えてください";
+                    }
+                    else
+                    {
+                        continue;
+                    }
+
+                    int range1 = 5;
+                    //左肘が右肘より高い時　左肘を下げる
+                    if (skeleton.Joints[JointType.ElbowLeft].Position.Y - skeleton.Joints[JointType.ElbowRight].Position.Y > range1)
+                    {
+                        richTextBox1.Text += "左肘を下げてください";
+
+                    }
+                    //右肘が左肘より高い時　右肘を下げる
+                    if (skeleton.Joints[JointType.ElbowLeft].Position.Y - skeleton.Joints[JointType.ElbowRight].Position.Y < -range1)
+                    {
+                        richTextBox1.Text += "右肘を下げてください";
+                    }
+                    //左肩が右肩より高い時　左肩を下げる
+                    if (skeleton.Joints[JointType.ShoulderLeft].Position.Y - skeleton.Joints[JointType.ShoulderRight].Position.Y > range1)
+                    {
+                        richTextBox1.Text += "左肩を下げてください";
+
+                    }
+                    //右肩が左肩より高い時　右肩を下げる
+                    if (skeleton.Joints[JointType.ShoulderRight].Position.Y - skeleton.Joints[JointType.ShoulderLeft].Position.Y < -range1)
+                    {
+                        richTextBox1.Text += "肩の高さを揃えてください";
+                    }
+
+
+
+
+
+                }
+
+            }
+        }
+    }
+
+   // }
+   
     
 
 
