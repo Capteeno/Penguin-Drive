@@ -151,11 +151,29 @@ namespace WindowsFormsApplication3
                             }
                         }
                     }
+
+
+                    //////////////////////////////////////////メソッド
+
+                    Judge(kinect, skeletonFrame);
+
+                //////////////////////////////////////////////
                 }
             }
             catch (Exception ex)
             {
                 MessageBox.Show(ex.Message);
+            }
+        }
+
+        private void Judge(KinectSensor kinect, SkeletonFrame skeletonFrame)
+        {
+            foreach (var skeleton in skeletons)
+            {
+                if (skeleton.Joints[JointType.ElbowLeft].Position.Y > skeleton.Joints[JointType.ElbowRight].Position.Y)
+                {
+                    richTextBox1.Text += "左肘を下げてください";
+                }
             }
         }
 
@@ -211,12 +229,10 @@ namespace WindowsFormsApplication3
 
         private void button3_Click(object sender, EventArgs e)
         {
-           // while (true)
-            //{
+            {
                 richTextBox1.Text = "";
-
                 string text = richTextBox1.Text;
-
+                richTextBox1.Text += "投球フォームを構えてください";
 
                 foreach (var skeleton in skeletons)
                 {
@@ -226,16 +242,34 @@ namespace WindowsFormsApplication3
                         continue;
                     }
 
-                    if (skeleton.Joints[JointType.HandRight].Position.Y > skeleton.Joints[JointType.ShoulderRight].Position.Y && skeleton.Joints[JointType.HandLeft].Position.Y > skeleton.Joints[JointType.ShoulderLeft].Position.Y)
+                    //肩より手を上に（肩より手が下の時）
+                    if (skeleton.Joints[JointType.HandRight].Position.Y < skeleton.Joints[JointType.ShoulderRight].Position.Y || skeleton.Joints[JointType.HandLeft].Position.Y < skeleton.Joints[JointType.ShoulderLeft].Position.Y)
                     {
-                        richTextBox1.Text += "投球フォームを構えてください";
+                        richTextBox1.Text += "手を肩より上にあげてください";
                     }
                     else
                     {
                         continue;
                     }
 
-                    int range1 = 5;
+                    //手を頭後方に持ってくる指示
+                    if (skeleton.Joints[JointType.Head].Position.Z < skeleton.Joints[JointType.HandLeft].Position.Z || skeleton.Joints[JointType.Head].Position.Z < skeleton.Joints[JointType.HandLeft].Position.Z)
+                    {
+                        richTextBox1.Text += "手が頭の後ろになるようにしてください";
+                        break;
+
+                    }
+                }
+            }
+            foreach (var skeleton in skeletons)
+            {
+                //スケルトンがトラッキングされてなければ次へ
+                if (skeleton.TrackingState != SkeletonTrackingState.Tracked)
+                {
+                    continue;
+                }
+
+                int range1 = 5;
                     //左肘が右肘より高い時　左肘を下げる
                     if (skeleton.Joints[JointType.ElbowLeft].Position.Y - skeleton.Joints[JointType.ElbowRight].Position.Y > range1)
                     {
@@ -269,7 +303,7 @@ namespace WindowsFormsApplication3
         }
     }
 
-   // }
+    
    
     
 
